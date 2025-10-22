@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from utils.db_utils import users
-from utils.ai_utils import genai_text
+from utils.ai_utils import generate_text
 from utils.weather_utils import get_weather
 from datetime import datetime
 import json
