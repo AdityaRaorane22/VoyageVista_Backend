@@ -41,7 +41,7 @@ async def generate_itinerary(request: Request):
     try:
         # correct usage
         response = genai_client.generate_text(
-            model="gemini-2.0",
+            model="gemini-2.0-flash-exp",
             prompt=prompt,
             temperature=0.7,
             max_output_tokens=1024
@@ -86,7 +86,7 @@ async def get_suggested_trips(request: Request):
 
     try:
         response = genai_client.generate_text(
-            model="gemini-2.0",
+            model="gemini-2.0-flash-exp",
             prompt=prompt,
             temperature=0.7,
             max_output_tokens=512
