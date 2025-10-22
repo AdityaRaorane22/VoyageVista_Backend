@@ -24,11 +24,8 @@ async def generate_itinerary(request: Request):
         if user and "itinerary_history" in user and len(user["itinerary_history"]) > 0:
             user_history = "\n\nUser's Previous Travel Style: Based on past trips, the user enjoys personalized experiences."
 
-    # (same prompt as before)
-    prompt = f"""Create a detailed {days}-day travel itinerary for {destination}...
-    """
+    prompt = f"""Create a detailed {days}-day travel itinerary for {destination}, considering interests: {interests}, budget: {budget}, and meal preference: {meal_preference}.{user_history}"""
 
-    response = genai_client.models.generate_content(model="gemini-2.0-flash-exp", contents=prompt)
     itinerary_text = generate_text(prompt)
 
     if user_email:
@@ -57,11 +54,9 @@ async def get_suggested_trips(request: Request):
             past_destinations = [trip.get("destination", "") for trip in user["itinerary_history"]]
             user_context = f"\nUser has visited: {', '.join(past_destinations)}"
 
-    prompt = f"""Generate 6 diverse travel destination recommendations...
-    """
+    prompt = f"Generate 6 diverse travel destination recommendations for a user. {user_context}"
 
     try:
-        response = genai_client.models.generate_content(model="gemini-2.0-flash-exp", contents=prompt)
         response_text = generate_text(prompt).strip()
         if response_text.startswith("```"):
             response_text = response_text.split("```")[1]
