@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from utils.db_utils import users
-from utils.ai_utils import genai_client
+from utils.ai_utils import genai_text
 from utils.weather_utils import get_weather
 from datetime import datetime
 import json
@@ -29,7 +29,7 @@ async def generate_itinerary(request: Request):
     """
 
     response = genai_client.models.generate_content(model="gemini-2.0-flash-exp", contents=prompt)
-    itinerary_text = response.text
+    itinerary_text = generate_text(prompt)
 
     if user_email:
         itinerary_record = {
