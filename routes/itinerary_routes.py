@@ -1,7 +1,6 @@
-# routes/itinerary_routes.py
 from fastapi import APIRouter, Request
 from utils.db_utils import users
-from utils.ai_utils import genai
+from utils.ai_utils import genai_client
 from utils.weather_utils import get_weather
 from datetime import datetime
 import json
@@ -13,7 +12,7 @@ router = APIRouter()
 async def generate_itinerary(request: Request):
     data = await request.json()
     destination = data.get("destination")
-    days = int(data.get("days", 3))  # default to 3 days
+    days = int(data.get("days", 3))
     interests = data.get("interests", "")
     budget = data.get("budget", "moderate")
     meal_preference = data.get("mealPreference", "no-preference")
@@ -22,10 +21,8 @@ async def generate_itinerary(request: Request):
     if not destination:
         return {"success": False, "error": "Destination is required."}
 
-    # Weather info
     weather_data = get_weather(destination)
 
-    # User travel history context
     user_history = ""
     if user_email:
         user = users.find_one({"email": user_email}, {"_id": 0, "itinerary_history": 1})
@@ -35,7 +32,6 @@ async def generate_itinerary(request: Request):
                 "the user enjoys personalized experiences."
             )
 
-    # Prompt for Gemini AI
     prompt = (
         f"Create a detailed {days}-day travel itinerary for {destination} "
         f"for a traveler interested in {interests}. Budget: {budget}, Meal preference: {meal_preference}."
@@ -43,15 +39,15 @@ async def generate_itinerary(request: Request):
     )
 
     try:
-        response = genai.generate(
+        # correct usage
+        response = genai_client.generate_text(
             model="gemini-2.0",
+            prompt=prompt,
             temperature=0.7,
-            max_output_tokens=1024,
-            prompt=prompt
+            max_output_tokens=1024
         )
-        itinerary_text = response["candidates"][0]["content"]
+        itinerary_text = response.output_text
 
-        # Save itinerary to user history
         if user_email:
             itinerary_record = {
                 "destination": destination,
@@ -74,7 +70,6 @@ async def get_suggested_trips(request: Request):
     data = await request.json()
     user_email = data.get("email")
 
-    # Context about previous trips
     user_context = ""
     if user_email:
         user = users.find_one({"email": user_email}, {"_id": 0, "itinerary_history": 1})
@@ -83,7 +78,6 @@ async def get_suggested_trips(request: Request):
             if past_destinations:
                 user_context = f"\nUser has visited: {', '.join(past_destinations)}"
 
-    # Prompt for AI
     prompt = (
         f"Generate 6 diverse travel destination recommendations for a traveler."
         f"{user_context}"
@@ -91,15 +85,14 @@ async def get_suggested_trips(request: Request):
     )
 
     try:
-        response = genai.generate(
+        response = genai_client.generate_text(
             model="gemini-2.0",
+            prompt=prompt,
             temperature=0.7,
-            max_output_tokens=512,
-            prompt=prompt
+            max_output_tokens=512
         )
-        response_text = response["candidates"][0]["content"].strip()
+        response_text = response.output_text.strip()
 
-        # Clean code block / json formatting
         if response_text.startswith("```"):
             response_text = response_text.split("```")[1]
             if response_text.startswith("json"):
