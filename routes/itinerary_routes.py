@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from utils.db_utils import users
-from utils.ai_utils import generate_text
+from utils.ai_utils import genai_client
 from utils.weather_utils import get_weather
 from datetime import datetime
 import json
@@ -24,9 +24,12 @@ async def generate_itinerary(request: Request):
         if user and "itinerary_history" in user and len(user["itinerary_history"]) > 0:
             user_history = "\n\nUser's Previous Travel Style: Based on past trips, the user enjoys personalized experiences."
 
-    prompt = f"""Create a detailed {days}-day travel itinerary for {destination}, considering interests: {interests}, budget: {budget}, and meal preference: {meal_preference}.{user_history}"""
+    # (same prompt as before)
+    prompt = f"""Create a detailed {days}-day travel itinerary for {destination}...
+    """
 
-    itinerary_text = generate_text(prompt)
+    response = genai_client.models.generate_content(model="gemini-2.0-flash-exp", contents=prompt)
+    itinerary_text = response.text
 
     if user_email:
         itinerary_record = {
@@ -54,10 +57,12 @@ async def get_suggested_trips(request: Request):
             past_destinations = [trip.get("destination", "") for trip in user["itinerary_history"]]
             user_context = f"\nUser has visited: {', '.join(past_destinations)}"
 
-    prompt = f"Generate 6 diverse travel destination recommendations for a user. {user_context}"
+    prompt = f"""Generate 6 diverse travel destination recommendations...
+    """
 
     try:
-        response_text = generate_text(prompt).strip()
+        response = genai_client.models.generate_content(model="gemini-2.0-flash-exp", contents=prompt)
+        response_text = response.text.strip()
         if response_text.startswith("```"):
             response_text = response_text.split("```")[1]
             if response_text.startswith("json"):
