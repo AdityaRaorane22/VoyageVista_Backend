@@ -62,7 +62,7 @@ async def get_suggested_trips(request: Request):
 
     try:
         response = genai_client.models.generate_content(model="gemini-2.0-flash-exp", contents=prompt)
-        response_text = response.text.strip()
+        response_text = generate_text(prompt).strip()
         if response_text.startswith("```"):
             response_text = response_text.split("```")[1]
             if response_text.startswith("json"):
