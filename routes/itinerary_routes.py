@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from utils.db_utils import users
-from utils.ai_utils import genai_client
+from utils.ai_utils import genai
 from utils.weather_utils import get_weather
 from datetime import datetime
 import json
@@ -28,8 +28,8 @@ async def generate_itinerary(request: Request):
     prompt = f"""Create a detailed {days}-day travel itinerary for {destination}...
     """
 
-    response = genai_client.models.generate_content(model="gemini-2.0-flash-exp", contents=prompt)
-    itinerary_text = response.text
+    response = genai.models.generate(model="gemini-2.0-flash-exp", prompt=prompt)
+    itinerary_text = response.result
 
     if user_email:
         itinerary_record = {
@@ -61,8 +61,8 @@ async def get_suggested_trips(request: Request):
     """
 
     try:
-        response = genai_client.models.generate_content(model="gemini-2.0-flash-exp", contents=prompt)
-        response_text = response.text.strip()
+        response = genai.models.generate(model="gemini-2.0-flash-exp", prompt=prompt)
+        response_text = response.result.strip()
         if response_text.startswith("```"):
             response_text = response_text.split("```")[1]
             if response_text.startswith("json"):
