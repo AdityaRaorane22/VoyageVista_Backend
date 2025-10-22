@@ -27,31 +27,6 @@ It dynamically generates personalized itineraries, destination recommendations, 
 
 ---
 
-##  Project Structure
-
-
-backend/
-│
-├── main.py
-├── .env
-├── .gitignore
-├── requirements.txt
-│
-├── routes/
-│ ├── init.py
-│ ├── auth_routes.py
-│ ├── itinerary_routes.py
-│ ├── user_routes.py
-│
-└── utils/
-├── init.py
-├── db.py
-├── ai_utils.py
-├── weather_utils.py
-
-
----
-
 ##  Environment Variables
 
 Create a `.env` file in your project root and add the following:
@@ -93,7 +68,7 @@ Endpoint	Method	Description
 /itinerary/suggested-trips	POST	AI-powered trip recommendations
 
 
- Contributing
+Contributing
 
 Contributions are welcome!
 If you'd like to improve this backend or add new features, fork the repo and create a pull request.
