@@ -56,7 +56,7 @@ pip install -r requirements.txt
 # 4️⃣ Run FastAPI server
 uvicorn main:app --reload
 
-🌐 API Endpoints
+API Endpoints
 Endpoint	Method	Description
 /	GET	Health check
 /auth/signup	POST	Register new user
