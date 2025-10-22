@@ -4,12 +4,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
 genai.api_key = GEMINI_API_KEY
 
 def generate_text(prompt: str):
-    response = genai.generate_text(
+    response = genai.chat(
         model="gemini-2.0-flash-exp",
-        prompt=prompt
+        messages=[{"author": "user", "content": prompt}]
     )
-    return response.result
+    return response.last.content
