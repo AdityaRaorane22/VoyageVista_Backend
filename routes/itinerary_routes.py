@@ -74,8 +74,3 @@ async def get_suggested_trips(request: Request):
         return {"success": True, "trips": trips}
     except Exception as e:
         return {"success": False, "error": str(e)}
-```
-
-**I recommend Option 2** since `google-generativeai` is the official and more widely used package. Just make sure your `requirements.txt` has:
-```
-google-generativeai
