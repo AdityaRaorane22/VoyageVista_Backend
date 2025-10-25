@@ -38,3 +38,24 @@ def get_user_stats(email: str):
             "recentTrip": history[-1] if history else None
         }
     }
+
+
+
+@router.get("-stats/{email}")
+def get_user_stats_compat(email: str):
+    user = users.find_one({"email": email}, {"_id": 0, "itinerary_history": 1})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    history = user.get("itinerary_history", [])
+    total_trips = len(history)
+    total_days = sum([int(trip.get("days", 0)) for trip in history])
+    destinations = [trip.get("destination", "") for trip in history]
+    return {
+        "success": True,
+        "stats": {
+            "totalTrips": total_trips,
+            "totalDays": total_days,
+            "destinations": destinations,
+            "recentTrip": history[-1] if history else None
+        }
+    }
